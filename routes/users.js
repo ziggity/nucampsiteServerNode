@@ -5,10 +5,20 @@ const passport = require('passport');
 const router = express.Router();
 const authenticate = require('../authenticate');
 
-/* GET users listing. */
 router.get('/', function(req, res, next) {
     res.send('respond with a resource');
 });
+
+router.route('/')
+    .get(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+        User.find()
+            .then(users => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(users);
+            })
+            .catch(err => next(err));
+    });
 
 router.post('/signup', (req, res) => {
   User.register(
